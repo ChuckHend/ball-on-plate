@@ -1,3 +1,7 @@
+//script to collect data on a step input
+//moves ball to corner, then collects data as system responds
+//to a center of plate setpoint
+
 #include <SPI.h>
 #include <Wire.h>
 #include <Servo.h>

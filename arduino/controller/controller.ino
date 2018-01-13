@@ -1,3 +1,7 @@
+//main controller for ball on plate system
+//reads touch screen, runs PID, controls servos
+//sends data via serial
+
 #include <SPI.h>
 #include <Wire.h>
 #include <Servo.h>
@@ -63,16 +67,19 @@ PID PIDy(&currY, &outputY, &setPointY, Kp, Ki, 0, DIRECT);//MKI direct, MKII rev
 void setup() {
   Serial.begin(115200);      //baud rate
 
-for(int a = 2; a < 8; a++){  //set pints 2-7 as input
-  pinMode(a, INPUT);         //for program selection controller
-}
+  //init GPIO
+  for(int a = 2; a < 8; a++){  //set pints 2-7 as input
+    pinMode(a, INPUT);         //for program selection controller
+  }
+  
   //init touchscreen
   Serial.flush();
   if (! touchPanel.begin()) {
     //Serial.println("ERROR: STMPE controller not found");
     while (1);
   }
-  //initialize servos
+  
+  //init servos
   //pulse width default is 544-2400
   //hitec is  750-2250μsec per datasheet
   servoX.attach(xPin, 750, 2250);

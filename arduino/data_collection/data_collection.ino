@@ -1,3 +1,5 @@
+// script to collect data on a range of Kp, Kd, Ki parameters
+
 #include <SPI.h>
 #include <Wire.h>
 #include <Servo.h>
