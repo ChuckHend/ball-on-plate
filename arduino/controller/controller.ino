@@ -19,8 +19,8 @@ Servo servoX, servoY;
 //some variables for calculations
 boolean inActive = true; //ball off plate by default
 
-double minPos        = -45, //constrain on servo output
-       maxPos        = 45,  //constrain on servo output
+double minPos        = -35, //constrain on servo output
+       maxPos        = 35,  //constrain on servo output
        setPointX     = 500, //center of X plane
        setPointY     = 500, //center of Y plane
        errorX        = 0,   //current x error
@@ -32,9 +32,9 @@ double minPos        = -45, //constrain on servo output
        dx            = 0,   //change in x position
        dy            = 0,   //change in y position
 
-       Kp           = 0.027,   //proportional gain [.027]
+       Kp           = 0.04,   //proportional gain [.027]
        Ki           = 0.00,    //integral gain [.03]
-       Kd           = -0.195,  //velocity gain [-0.195]
+       Kd           = -0.166,  //velocity gain [-0.195]
 
        outputX,               //output from xPID class
        outputY;               //output from yPID class
@@ -48,8 +48,8 @@ int stableX = 5,
     stableY = 5,
     dTermX,                 //x velocity response output
     dTermY,                 //y velocity response output
-    servoNeutralX  = 55,    //x axis, increase for CW rot.
-    servoNeutralY  = 42,    //y axis. increase for CW rot.
+    servoNeutralX  = 40,    //x axis, increase for CW rot.
+    servoNeutralY  = 57,    //y axis. increase for CW rot.
     servoRequest_x = 0,     //x servo, sum of PIDD responses
     servoRequest_y = 0,     //y servo, sum of PIDD responses
     i =              0,     //inactive plate counter
@@ -71,14 +71,14 @@ void setup() {
   for(int a = 2; a < 8; a++){  //set pints 2-7 as input
     pinMode(a, INPUT);         //for program selection controller
   }
-  
+
   //init touchscreen
   Serial.flush();
   if (! touchPanel.begin()) {
-    //Serial.println("ERROR: STMPE controller not found");
+    Serial.println("ERROR: STMPE controller not found");
     while (1);
   }
-  
+
   //init servos
   //pulse width default is 544-2400
   //hitec is  750-2250μsec per datasheet
@@ -102,9 +102,9 @@ void setup() {
 void loop() {
   t = millis();     //set time when loop starts
 
-  programSelect = getProgram();     //acquire ball action program from controller
-  //programSelect = 1;              //disable controller, keep SP default
-  runProgram(programSelect);        //set program from previous command
+  //programSelect = getProgram(); //acquire ball action program from controller
+  programSelect = 1;              //disable remote controller, keep SP default
+  runProgram(programSelect);      //set program from previous command
   PIDx.SetTunings(Kp, Ki, 0);
   PIDy.SetTunings(Kp, Ki, 0);
 
@@ -149,7 +149,7 @@ if(!inActive){
   //calculate velocity and acceleration output terms
   //velocity and accel * respective gain values
   dTermX  = constrain(dx * Kd, minPos, maxPos);
-  dTermY  = constrain(dy * Kd, minPos, maxPos);
+  dTermY  = -constrain(dy * Kd, minPos, maxPos);
 
   //remember variables for next iteration
   lastX = currX;
