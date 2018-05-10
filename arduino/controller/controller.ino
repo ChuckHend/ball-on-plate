@@ -5,6 +5,7 @@
 #include <Servo.h>
 #include "Adafruit_STMPE610.h"
 #include <PID_v1.h>
+#include <EEPROM.h>
 
 #define dt 80     //cycle time in milliseconds
 #define xPin 10   //x axis to pin 10
@@ -35,11 +36,16 @@ double OUTPUT_MIN = -45,
 unsigned long t =         0,  //for fixing loop time
               touched =   0;  //counting time last touched
      
- int servoNeutralX  = 36,//40,    //x axis, increase for CW rot.[40]
-     servoNeutralY  = 54,//57,    //y axis. increase for CW rot.[57]
+ int servoNeutralX  = EEPROM.read(0),//40,    //x axis, increase for CW rot.[40]
+     servoNeutralY  = EEPROM.read(1),//57,    //y axis. increase for CW rot.[57]
      servoRequest_x = 0,     //x servo, sum of PIDD responses
-     servoRequest_y = 0;     //y servo, sum of PIDD responses
+     servoRequest_y = 0,     //y servo, sum of PIDD responses
 
+     errX,
+     errY,
+     x_last = 0,
+     y_last = 0;
+     
 uint16_t x, y;              // for touchscreen variables
 uint8_t z;                  // touchscreen variables
 
@@ -74,6 +80,7 @@ void setup() {
   PIDy.SetOutputLimits(OUTPUT_MIN, OUTPUT_MAX);
   PIDx.SetSampleTime(10);
   PIDy.SetSampleTime(10);
+  
 }
 
 void loop() {
@@ -87,6 +94,42 @@ void loop() {
   servoRequest_x = servoNeutralX + outputX;
   servoRequest_y = servoNeutralY + outputY;
 
+  write_servos();
+  
+  pyPrint();
+  
+  while ((millis() - t) < dt) { 
+    // Making sure the cycle time is equal to dt
+    //do nothing
+  }
+
+  check_stable();
+  
+  x_last = currX;
+  y_last = currY;
+}
+
+void check_stable(){
+  errX = abs(setPointX - x_last);
+  errY = abs(setPointY - y_last);
+
+  if (errX < 10){
+    EEPROM.write(0, servoRequest_x);
+    Serial.println("Saving X: ");
+    Serial.println(servoRequest_x);
+  }
+
+  if (errY < 10){
+    EEPROM.write(1, servoRequest_y);
+    Serial.println("Saving Y: ");
+    Serial.println(servoRequest_y);
+  }
+
+}
+
+
+void write_servos(){
+  
   if(millis() - touched > 500){
     inActive = true;
     currX = setPointX;
@@ -104,13 +147,6 @@ void loop() {
   else if (!inActive){
     servoX.write(servoRequest_x);
     servoY.write(servoRequest_y);
-  }
-  
-  pyPrint();
-  
-  while ((millis() - t) < dt) { 
-    // Making sure the cycle time is equal to dt
-    //do nothing
   }
 }
 
@@ -146,3 +182,8 @@ void getTouchPanel(){
   }//end touchpanel acquisition
 
 }//end getTouchPanel
+
+bool stable(){
+  
+}
+
