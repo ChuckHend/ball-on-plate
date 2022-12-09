@@ -36,16 +36,16 @@ double OUTPUT_MIN = -45,
 unsigned long t =         0,  //for fixing loop time
               touched =   0;  //counting time last touched
      
- int servoNeutralX  = EEPROM.read(0),//40,    //x axis, increase for CW rot.[40]
-     servoNeutralY  = EEPROM.read(1),//57,    //y axis. increase for CW rot.[57]
-     servoRequest_x = 0,     //x servo, sum of PIDD responses
-     servoRequest_y = 0,     //y servo, sum of PIDD responses
+int servoNeutralX  = EEPROM.read(0),//40,    //x axis, increase for CW rot.[40]
+    servoNeutralY  = EEPROM.read(1),//57,    //y axis. increase for CW rot.[57]
+    servoRequest_x = 0,     //x servo, sum of PIDD responses
+    servoRequest_y = 0,     //y servo, sum of PIDD responses
 
-     errX,
-     errY,
-     x_last = 0,
-     y_last = 0;
-     
+    errX,
+    errY,
+    x_last = 0,
+    y_last = 0;
+
 uint16_t x, y;              // for touchscreen variables
 uint8_t z;                  // touchscreen variables
 
@@ -115,13 +115,13 @@ void check_stable(){
 
   if (errX < 10){
     EEPROM.write(0, servoRequest_x);
-    Serial.println("Saving X: ");
+    Serial.print("Saving X: ");
     Serial.println(servoRequest_x);
   }
 
   if (errY < 10){
     EEPROM.write(1, servoRequest_y);
-    Serial.println("Saving Y: ");
+    Serial.print("Saving Y: ");
     Serial.println(servoRequest_y);
   }
 
@@ -182,8 +182,3 @@ void getTouchPanel(){
   }//end touchpanel acquisition
 
 }//end getTouchPanel
-
-bool stable(){
-  
-}
-
